@@ -1,0 +1,72 @@
+clc; clear; close all;
+
+%% ============================
+% 🌸 IRIS DATASET ANALYSIS
+% ============================
+disp('--- IRIS DATASET ANALYSIS ---');
+
+% Load built-in Iris dataset
+load fisheriris
+X_iris = meas;
+y_iris = species;
+
+% Train-test split
+cv1 = cvpartition(y_iris, 'HoldOut', 0.2);
+XTrain1 = X_iris(training(cv1), :);
+YTrain1 = y_iris(training(cv1));
+XTest1 = X_iris(test(cv1), :);
+YTest1 = y_iris(test(cv1));
+
+% Train classifier
+model_iris = fitcecoc(XTrain1, YTrain1); % Multiclass SVM
+
+% Predict and evaluate
+YPred1 = predict(model_iris, XTest1);
+accuracy1 = sum(strcmp(YPred1, YTest1)) / numel(YTest1);
+fprintf('Iris Dataset Accuracy: %.2f%%\n', accuracy1 * 100);
+
+% Confusion matrix
+figure;
+confusionchart(YTest1, YPred1);
+title('Confusion Matrix - IRIS Dataset');
+
+
+%% ============================
+% 🚢 TITANIC DATASET (Hardcoded Sample)
+% ============================
+disp('--- TITANIC DATASET ANALYSIS ---');
+
+% Sample Titanic-like data: [Pclass, Sex, Age, SibSp, Parch, Fare, Embarked]
+X_titanic = [
+    3 1 22 1 0 7.25 3;
+    1 2 38 1 0 71.28 1;
+    3 2 26 0 0 7.92 3;
+    1 2 35 1 0 53.10 3;
+    3 1 35 0 0 8.05 3;
+    3 1 28 0 0 8.46 3;
+    1 1 54 0 0 51.86 3;
+    3 2 2 3 1 21.07 3;
+    2 2 27 0 0 13.00 3;
+    3 1 14 5 2 46.90 3
+];
+y_titanic = [0;1;1;1;0;0;0;1;1;0];  % Survived (1) / Not (0)
+
+% Split into train/test (80/20)
+cv2 = cvpartition(y_titanic, 'HoldOut', 0.2);
+XTrain2 = X_titanic(training(cv2), :);
+YTrain2 = y_titanic(training(cv2));
+XTest2 = X_titanic(test(cv2), :);
+YTest2 = y_titanic(test(cv2));
+
+% Train decision tree
+model_titanic = fitctree(XTrain2, YTrain2);
+
+% Predict and evaluate
+YPred2 = predict(model_titanic, XTest2);
+accuracy2 = sum(YPred2 == YTest2) / numel(YTest2);
+fprintf('Titanic Sample Dataset Accuracy: %.2f%%\n', accuracy2 * 100);
+
+% Confusion matrix
+figure;
+confusionchart(YTest2, YPred2);
+title('Confusion Matrix - TITANIC Sample Dataset');
